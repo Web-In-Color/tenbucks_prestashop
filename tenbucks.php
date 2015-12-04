@@ -1,5 +1,6 @@
 <?php
 /**
+* Main module class
 *
 *  @author    Web In Color <contact@prestashop.com>
 *  @copyright 2012-2015 Web In Color

@@ -4,9 +4,6 @@
  *
  * Used to get iframe url and generate specific token.
  *
- * Also maintains the unique identifier of this plugin as well as the current
- * version of the plugin.
- *
  *  @since     1.0.0
  *
  *  @author    Web In Color <contact@prestashop.com>
@@ -14,6 +11,7 @@
  *  @license   http://www.apache.org/licenses/  Apache License
  *  International Registered Trademark & Property of Web In Color
  */
+
 final class WIC_Server
 {
     // const URL = 'https://apps.webincolor.fr/woocommerce/';
