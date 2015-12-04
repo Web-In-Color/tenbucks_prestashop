@@ -23,7 +23,7 @@
          $this->override_folder = 'tenbucks/';
      }
 
-     protected function getServerUri($redirect = null, $standalone = false)
+     protected function getServerUri($standalone = false)
      {
          $query = $this->getQuery();
          if ($this->redirect_to) {
@@ -36,7 +36,7 @@
      public function renderModulesList()
      {
          $this->page_header_toolbar_btn['standalone'] = array(
-            'href' => $this->getServerUri(null, true),
+            'href' => $this->getServerUri(true),
             'desc' => $this->l('Standalone mode', null, null, false),
             'icon' => 'process-icon-preview',
         );
