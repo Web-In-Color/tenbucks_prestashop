@@ -1,5 +1,6 @@
 <?php
 /**
+*
 *  @author    Web In Color <contact@prestashop.com>
 *  @copyright 2012-2015 Web In Color
 *  @license   http://www.apache.org/licenses/  Apache License
@@ -12,13 +13,13 @@ if (!defined('_PS_VERSION_')) {
 
 include_once dirname(__FILE__).'/classes/WIC_Server.php';
 
-class Tenbucks extends Module
+class tenbucks extends Module
 {
     protected $output;
     protected $ctrls = array(
         'AdminTenbucksAccount',
         'AdminTenbucksApps',
-        'AdminTenbucksParent'
+        'AdminTenbucksParent',
     );
 
     public function __construct()
@@ -28,6 +29,7 @@ class Tenbucks extends Module
         $this->version = '1.0.0';
         $this->author = 'Web In Color';
         $this->need_instance = 0;
+        $this->module_key = 'f379014b011869cc93e15c074b374294';
         $this->output = '';
 
         /*
@@ -62,7 +64,7 @@ class Tenbucks extends Module
     {
         $keys = array(
             'TENBUCKS_WEBSERVICE_KEY_ID',
-            'TENBUCKS_DISPLAY_HELP'
+            'TENBUCKS_DISPLAY_HELP',
         );
 
         foreach ($keys as $key) {
@@ -114,6 +116,7 @@ class Tenbucks extends Module
                     $valid = false;
                 }
             }
+
             return $valid;
         } else {
             return false;
@@ -124,12 +127,12 @@ class Tenbucks extends Module
     {
         $valid = true;
         foreach ($this->ctrls as $ctrl) {
-            $id_tab = (int)Tab::getIdFromClassName($ctrl);
+            $id_tab = (int) Tab::getIdFromClassName($ctrl);
             if (!$id_tab) {
                 return true;
             }
             $tab = new Tab($id_tab);
-            if (!(bool)$tab->delete()) {
+            if (!(bool) $tab->delete()) {
                 $valid = false;
             }
         }
@@ -160,7 +163,7 @@ class Tenbucks extends Module
         $query->select('COUNT(`id_webservice_account`)')
             ->from(WebserviceKey::$definition['table'])
             ->where('`active` =  1');
-        $count = (int)Db::getInstance()->getValue($query);
+        $count = (int) Db::getInstance()->getValue($query);
 
         if ($count) {
             $this->output .= $this->renderForm();
@@ -173,7 +176,7 @@ class Tenbucks extends Module
 
         $this->context->smarty->assign(array(
             'module_dir' => $this->_path,
-            'ctrl_link' => $this->context->link->getAdminLink($this->controllerName, true)
+            'ctrl_link' => $this->context->link->getAdminLink($this->controllerName, true),
         ));
 
         $this->output .= $this->context->smarty->fetch($this->getAdminTemplatePath('configure'));
@@ -260,7 +263,7 @@ class Tenbucks extends Module
     protected function getConfigFormValues()
     {
         return array(
-            'TENBUCKS_WEBSERVICE_KEY_ID' => Configuration::get('TENBUCKS_WEBSERVICE_KEY_ID')
+            'TENBUCKS_WEBSERVICE_KEY_ID' => Configuration::get('TENBUCKS_WEBSERVICE_KEY_ID'),
         );
     }
 
@@ -289,7 +292,7 @@ class Tenbucks extends Module
             'configure' => $this->name,
             'tab_module' => $this->tab,
             'module_name' => $this->name,
-            'generate_key' => true
+            'generate_key' => true,
         ));
 
         return $this->context->link->getAdminLink('AdminModules', true).'&'.$query_string;
@@ -311,7 +314,7 @@ class Tenbucks extends Module
                 && in_array($method, $data['forbidden_method'])) {
                     continue;
                 }
-                $resources[$resource_name][$method] = true ;
+                $resources[$resource_name][$method] = true;
             }
         };
         WebserviceKey::setPermissionForAccount($webservice_key->id, $resources);

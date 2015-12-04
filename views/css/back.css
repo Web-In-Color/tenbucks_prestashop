@@ -11,10 +11,10 @@
   border: 0 none;
 }
 
-#maintab-AdminTenbucksParent .icon-AdminTenbucksParent {
+.icon-AdminTenbucksParent {
   background: url("../../logo.png") no-repeat scroll center center/contain transparent;
 }
-#maintab-AdminTenbucksParent .icon-AdminTenbucksParent:before {
+.icon-AdminTenbucksParent:before {
   content: " ";
 }
 
