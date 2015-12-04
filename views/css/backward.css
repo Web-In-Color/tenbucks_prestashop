@@ -1,0 +1,35 @@
+.panel {
+  margin-bottom: 12px;
+  padding: 12px;
+  clear: both;
+}
+
+.btn {
+  padding: 6px 12px;
+}
+.btn.btn-sm {
+  padding: 3px 6px;
+  font-size: 0.9em;
+}
+
+.btn,
+.panel {
+  border: 1px solid #eee;
+}
+
+.pull-right {
+  float: right;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.lead {
+  font-weight: lighter;
+  font-size: 1.2em;
+  line-height: 1.5em;
+  margin-bottom: 12px;
+}
+
+/*# sourceMappingURL=backward.css.map */

@@ -1,0 +1,21 @@
+@charset "UTF-8";
+#main, #main #content {
+  height: 100%;
+}
+
+#tenbucks_iframe {
+  display: block;
+  height: 100%;
+  min-height: 600px;
+  width: 100%;
+  border: 0 none;
+}
+
+#maintab-AdminTenbucksParent .icon-AdminTenbucksParent {
+  background: url("../../logo.png") no-repeat scroll center center/contain transparent;
+}
+#maintab-AdminTenbucksParent .icon-AdminTenbucksParent:before {
+  content: " ";
+}
+
+/*# sourceMappingURL=back.css.map */
