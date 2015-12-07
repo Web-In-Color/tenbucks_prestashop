@@ -14,7 +14,7 @@ if (!defined('_PS_VERSION_')) {
 
 include_once dirname(__FILE__).'/classes/WIC_Server.php';
 
-class tenbucks extends Module
+class Tenbucks extends Module
 {
     protected $output;
     protected $ctrls = array(
@@ -76,6 +76,11 @@ class tenbucks extends Module
             $this->uninstallModuleTab();
     }
 
+    /**
+     * Generate a Tenbucks tab on admin
+     * 
+     * @return boolean installation success
+     */
     protected function installModuleTab()
     {
         if (version_compare(_PS_VERSION_, '1.6.0.0', '<')) {
@@ -124,6 +129,11 @@ class tenbucks extends Module
         }
     }
 
+    /**
+     * Uninstall tenbucks tab
+     * 
+     * @return boolean
+     */
     protected function uninstallModuleTab()
     {
         $valid = true;
@@ -143,6 +153,8 @@ class tenbucks extends Module
 
     /**
      * Load the configuration form.
+     * 
+     * @return string HTML content
      */
     public function getContent()
     {
@@ -282,11 +294,20 @@ class tenbucks extends Module
         $this->output .= $this->displayConfirmation($this->l('Settings updated.'));
     }
 
+    /**
+     * Get a template path
+     * 
+     * @param string $template template name, without extension
+     * @return string complete path
+     */
     public function getAdminTemplatePath($template)
     {
         return sprintf($this->local_path.'views/templates/admin/%s.tpl', $template);
     }
 
+    /**
+     * Get a webservice key generation link
+     */
     public function getGenerateLink()
     {
         $query_string = http_build_query(array(
@@ -298,6 +319,10 @@ class tenbucks extends Module
 
         return $this->context->link->getAdminLink('AdminModules', true).'&'.$query_string;
     }
+
+    /**
+     * Generate a webservice key with proper rights
+     */
     protected function generateKey()
     {
         $crud_methods = array('GET', 'PUT', 'POST', 'DELETE');
@@ -325,16 +350,21 @@ class tenbucks extends Module
         $this->output .= $this->displayConfirmation($conf);
         unset($crud_methods, $hash, $webservice_key, $resources, $format, $conf);
     }
+
     /**
      * Add the CSS & JavaScript files you want to be loaded in the BO.
      */
     public function hookBackOfficeHeader()
     {
+        if ($this->active && version_compare(_PS_VERSION_, '1.6.0.0', '>=')) {
+            $this->context->controller->addCSS($this->_path.'views/css/back.css');
+        }
+
         if (Tools::getValue('module_name') == $this->name ||
             in_array(Tools::getValue('controller'), $this->ctrls)) {
             $this->context->controller->addJquery();
             $this->context->controller->addJS($this->_path.'views/js/back.js');
-            $this->context->controller->addCSS($this->_path.'views/css/back.css');
+            $this->context->controller->addCSS($this->_path.'views/css/controller.css');
             if (version_compare(_PS_VERSION_, '1.6.0.0', '<')) {
                 $this->context->controller->addCSS($this->_path.'views/css/backward.css');
             }
