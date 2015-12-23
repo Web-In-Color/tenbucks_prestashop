@@ -78,7 +78,7 @@ class Tenbucks extends Module
 
     /**
      * Generate a Tenbucks tab on admin
-     * 
+     *
      * @return boolean installation success
      */
     protected function installModuleTab()
@@ -131,7 +131,7 @@ class Tenbucks extends Module
 
     /**
      * Uninstall tenbucks tab
-     * 
+     *
      * @return boolean
      */
     protected function uninstallModuleTab()
@@ -153,7 +153,7 @@ class Tenbucks extends Module
 
     /**
      * Load the configuration form.
-     * 
+     *
      * @return string HTML content
      */
     public function getContent()
@@ -189,7 +189,7 @@ class Tenbucks extends Module
 
         $this->context->smarty->assign(array(
             'module_dir' => $this->_path,
-            'ctrl_link' => $this->context->link->getAdminLink($this->controllerName, true),
+            'ctrl_link' => $this->context->link->getAdminLink($this->ctrls[0], true),
         ));
 
         $this->output .= $this->context->smarty->fetch($this->getAdminTemplatePath('configure'));
@@ -296,7 +296,7 @@ class Tenbucks extends Module
 
     /**
      * Get a template path
-     * 
+     *
      * @param string $template template name, without extension
      * @return string complete path
      */

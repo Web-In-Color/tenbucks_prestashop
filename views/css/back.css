@@ -1,6 +1,6 @@
 @charset "UTF-8";
 .icon-AdminTenbucksParent {
-  background: url("../../logo.png") no-repeat scroll center center/contain transparent;
+  background: url("../img/logo_white-32x32.png") no-repeat scroll center center/contain transparent;
 }
 .icon-AdminTenbucksParent:before {
   content: " ";
