@@ -2,7 +2,7 @@
 /**
 * Main module class
 *
-*  @author    Web In Color <contact@prestashop.com>
+*  @author    Web In Color <contact@webincolor.fr>
 *  @copyright 2012-2015 Web In Color
 *  @license   http://www.apache.org/licenses/  Apache License
 *  International Registered Trademark & Property of Web In Color
@@ -16,7 +16,19 @@ include_once dirname(__FILE__).'/classes/WIC_Server.php';
 
 class Tenbucks extends Module
 {
+    /**
+    * @var string $output Configuration page HTML
+    */
     protected $output;
+
+    /**
+     * @var array $informations List of informations messages
+     */
+    protected $informations = array();
+
+    /**
+    * @var array $ctrls module controllers list
+    */
     protected $ctrls = array(
         'AdminTenbucksAccount',
         'AdminTenbucksApps',
@@ -31,7 +43,6 @@ class Tenbucks extends Module
         $this->author = 'Web In Color';
         $this->need_instance = 0;
         $this->module_key = 'f379014b011869cc93e15c074b374294';
-        $this->output = '';
 
         /*
          * Set $this->bootstrap to true if your module is compliant with bootstrap (PrestaShop 1.6)
@@ -41,7 +52,7 @@ class Tenbucks extends Module
         parent::__construct();
 
         $this->displayName = $this->l('tenbucks');
-        $this->description = $this->l('In in condimentum velit; nec massa nunc.');
+        $this->description = $this->l('Use tenbucks with your PrestaShop website.');
 
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall this module?');
     }
@@ -52,12 +63,12 @@ class Tenbucks extends Module
      */
     public function install()
     {
-        Configuration::updateValue('TENBUCKS_WEBSERVICE_KEY_ID', false);
-        Configuration::updateValue('TENBUCKS_DISPLAY_HELP', true);
-
+        Configuration::updateValue('TENBUCKS_WEBSERVICE_KEY_ID', 0);
+        Configuration::updateValue('TENBUCKS_TAB_ID', 0);
+        Configuration::updateValue('TENBUCKS_ACCOUNT_CREATED', false);
         return parent::install() &&
-            $this->installModuleTab() &&
-            $this->registerHook('header') &&
+            $this->registerHook('actionProductSave') &&
+            $this->registerHook('actionOrderStatusUpdate') &&
             $this->registerHook('backOfficeHeader');
     }
 
@@ -65,7 +76,8 @@ class Tenbucks extends Module
     {
         $keys = array(
             'TENBUCKS_WEBSERVICE_KEY_ID',
-            'TENBUCKS_DISPLAY_HELP',
+            'TENBUCKS_ACCOUNT_CREATED',
+            'TENBUCKS_TAB_ID'
         );
 
         foreach ($keys as $key) {
@@ -83,6 +95,10 @@ class Tenbucks extends Module
      */
     protected function installModuleTab()
     {
+        if ((int)Configuration::get('TENBUCKS_TAB_ID')) {
+            return true;
+        }
+
         if (version_compare(_PS_VERSION_, '1.6.0.0', '<')) {
             // v1.5 icon in menu
             Tools::copy(_PS_MODULE_DIR_.$this->name.'/views/img/logo.gif',
@@ -108,6 +124,7 @@ class Tenbucks extends Module
         $parent_tab->id_parent = 0;
 
         if ($parent_tab->save()) {
+            Configuration::updateValue('TENBUCKS_TAB_ID', $parent_tab->id);
             foreach ($controllers as $class_name => $name) {
                 $tab_names = array();
                 foreach ($languages as $lang) {
@@ -158,33 +175,12 @@ class Tenbucks extends Module
      */
     public function getContent()
     {
+        $this->output = '';
         /*
          * If values have been submitted in the form, process.
          */
         if (Tools::isSubmit('submitTenbucksModule')) {
-            $this->postProcess();
-        }
-        if (Tools::isSubmit('generate_key')) {
-            $this->generateKey();
-        }
-        if (!Configuration::get('PS_WEBSERVICE')) {
-            $error = $this->l('Your Webservice is deactivated, please active it in order to use our services.');
-            $this->output .= $this->displayError($error);
-        }
-
-        $query = new DbQuery();
-        $query->select('COUNT(`id_webservice_account`)')
-            ->from(WebserviceKey::$definition['table'])
-            ->where('`active` =  1');
-        $count = (int) Db::getInstance()->getValue($query);
-
-        if ($count) {
-            $this->output .= $this->renderForm();
-        } else {
-            $generate_uri = $this->getGenerateLink();
-            $this->context->smarty->assign('generate_uri', $generate_uri);
-
-            $this->output .= $this->context->smarty->fetch($this->getAdminTemplatePath('generate'));
+            $this->output .= $this->postProcess();
         }
 
         $this->context->smarty->assign(array(
@@ -192,7 +188,25 @@ class Tenbucks extends Module
             'ctrl_link' => $this->context->link->getAdminLink($this->ctrls[0], true),
         ));
 
-        $this->output .= $this->context->smarty->fetch($this->getAdminTemplatePath('configure'));
+        $header_ver = version_compare(_PS_VERSION_, '1.6.0.0', '<') ? '5' : '6';
+        $header_tpl = $this->getAdminTemplatePath('header_1.'.$header_ver);
+
+        $this->output .= $this->context->smarty->fetch($header_tpl);
+        if ((bool)Configuration::get('TENBUCKS_ACCOUNT_CREATED')) {
+            $standalone_url = WIC_Server::getUrl('dispatch', $this->getIframeQuery(), true);
+            $this->context->smarty->assign('standaloneUrl', $standalone_url);
+            $this->output .= $this->context->smarty->fetch(
+                $this->getAdminTemplatePath('configure')
+            );
+        } else {
+            $this->informations[] = $this->l('You have to create an account in order to use tenbucks.');
+            $this->output .= $this->renderForm();
+        }
+
+        // Display informations
+        foreach ($this->informations as $msg) {
+            $this->adminDisplayInformation($msg);
+        }
 
         return $this->output;
     }
@@ -230,19 +244,6 @@ class Tenbucks extends Module
      */
     protected function getConfigForm()
     {
-        $query = new DbQuery();
-        $query->select('`description`, `id_webservice_account`')
-            ->from(WebserviceKey::$definition['table'])
-            ->where('`active` =  1');
-        $results = Db::getInstance()->executeS($query);
-
-        $webservice_keys = array_map(function ($ws) {
-            return array(
-                'id' => $ws['id_webservice_account'],
-                'name' => $ws['description'],
-                    );
-        }, $results);
-
         return array(
             'form' => array(
                 'legend' => array(
@@ -251,16 +252,25 @@ class Tenbucks extends Module
                 ),
                 'input' => array(
                     array(
-                        'type' => 'select',
-                        'label' => $this->l('WebserviceKey:'),
-                        'desc' => $this->l('Which key do use for webservice access.'),
-                        'name' => 'TENBUCKS_WEBSERVICE_KEY_ID',
+                        'type' => 'text',
+                        'label' => $this->l('Your email:'),
+                        'desc' => $this->l('Your password will be send to this email, so it must be valid. If your already have an account, this shop will be added to your existing sites.'),
+                        'name' => 'email',
                         'required' => true,
-                        'options' => array(
-                            'query' => $webservice_keys,
-                            'id' => 'id',
-                            'name' => 'name',
-                        ),
+                    ),
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('Confirmation:'),
+                        'empty_message' => $this->l('Please confirm your email.'),
+                        'name' => 'email_confirmation',
+                        'required' => true,
+                    ),
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('Your sponsor email:'),
+                        'desc' => $this->l('Your sponsor email. Leave blank for none.'),
+                        'name' => 'sponsor',
+                        'required' => false,
                     ),
                 ),
                 'submit' => array(
@@ -272,11 +282,16 @@ class Tenbucks extends Module
 
     /**
      * Set values for the inputs.
+     *
+     * @return array
      */
     protected function getConfigFormValues()
     {
+        $email = Configuration::get('PS_SHOP_EMAIL');
         return array(
-            'TENBUCKS_WEBSERVICE_KEY_ID' => Configuration::get('TENBUCKS_WEBSERVICE_KEY_ID'),
+            'email' => Tools::getValue('email', $email),
+            'email_confirmation' => Tools::getValue('email_confirmation', $email),
+            'sponsor' => Tools::getValue('sponsor', null),
         );
     }
 
@@ -285,13 +300,68 @@ class Tenbucks extends Module
      */
     protected function postProcess()
     {
-        $form_values = $this->getConfigFormValues();
-
-        foreach (array_keys($form_values) as $key) {
-            Configuration::updateValue($key, Tools::getValue($key));
+        $email = Tools::getValue('email');
+        if (!Validate::isEmail($email)) {
+            $msg = $this->l('Invalid email');
+            return $this->displayError($msg);
+        } elseif ($email !== Tools::getValue('email_confirmation') ) {
+            $msg = $this->l('Email and confirmation are different.');
+            return $this->displayError($msg);
         }
 
-        $this->output .= $this->displayConfirmation($this->l('Settings updated.'));
+        if (!Configuration::get('PS_WEBSERVICE')) {
+            Configuration::updateValue('PS_WEBSERVICE', 1);
+            $this->informations[] = $this->l('Your Webservice has been activated for tenbucks use.');
+        }
+
+        if ($this->isCGI() && !Configuration::get('PS_WEBSERVICE_CGI_HOST')) {
+            Configuration::updateValue('PS_WEBSERVICE_CGI_HOST', 1);
+            $this->informations[] = $this->l('Your server is running as CGI, we actiated CGI mode for your Webservice.');
+        }
+
+        // Include vendor library
+        include dirname(__FILE__).'/vendor/tenbucks_registration_client/lib/TenbucksRegistrationClient.php';
+        $ws_key = $this->getWebServiceKey();
+        $lang_infos = explode('-', $this->context->language->language_code);
+
+        $opts = array(
+            'email' => $email,
+            'company' => $this->context->shop->name,
+            'platform' => 'PrestaShop',
+            'locale' => $lang_infos[0],
+            'country' => Tools::strtoupper($lang_infos[1]),
+            'url'         => $this->getShopUri(),
+            'credentials' => array(
+                'api_key'    => $ws_key->key, // key
+            )
+        );
+
+        // Add sponsor if any
+        $sponsor = Tools::getValue('sponsor');
+        if (Validate::isEmail($sponsor)) {
+            $opts['sponsor'] = Tools::strtolower($sponsor);
+        }
+
+        try {
+            $client = new TenbucksRegistrationClient();
+            $query = $client->send($opts);
+            $success = array_key_exists('success', $query) && (bool)$query['success'];
+            if ($success) {
+                // success
+                Configuration::updateValue('TENBUCKS_ACCOUNT_CREATED', 1);
+                $this->installModuleTab();
+                if ($query['new_account']) {
+                    $msg =  $this->l('Account created. Please check your email to confirm your address');
+                } else {
+                    $msg = $this->l('Shop added to your account.');
+                }
+                return $this->displayConfirmation($msg);
+            } else {
+                return $this->displayError($this->l('Creation failed, please try again.'));
+            }
+        } catch (Exception $e) {
+            return $this->displayError($e->getMessage());
+        }
     }
 
     /**
@@ -321,10 +391,35 @@ class Tenbucks extends Module
     }
 
     /**
+    * Check if server is running as (Fast)CGI
+    */
+    public function isCGI()
+    {
+        return (bool)preg_match('/f?cgi/', php_sapi_name());
+    }
+
+    /**
      * Generate a webservice key with proper rights
      */
-    protected function generateKey()
+    protected function getWebServiceKey()
     {
+        $id_key = (int)Configuration::get('TENBUCKS_WEBSERVICE_KEY_ID');
+
+        if ($id_key) {
+            $webservice_key = new WebserviceKey($id_key);
+
+            if (Validate::isLoadedObject($webservice_key)) {
+                if (!$webservice_key->active) {
+                    // Regenerate key
+                    $hash = Tools::encrypt(time());
+                    $webservice_key->key = Tools::strtoupper($hash);
+                    $webservice_key->active = true;
+                    $webservice_key->save();
+                }
+                return $webservice_key;
+            }
+        }
+
         $crud_methods = array('GET', 'PUT', 'POST', 'DELETE');
         $hash = Tools::encrypt(time());
         $webservice_key = new WebserviceKey();
@@ -346,9 +441,29 @@ class Tenbucks extends Module
         WebserviceKey::setPermissionForAccount($webservice_key->id, $resources);
         Configuration::updateValue('TENBUCKS_WEBSERVICE_KEY_ID', $webservice_key->id);
         $format = $this->l('New Webservice key created: %s.');
-        $conf = sprintf($format, $webservice_key->description);
-        $this->output .= $this->displayConfirmation($conf);
-        unset($crud_methods, $hash, $webservice_key, $resources, $format, $conf);
+        $this->informations[] = sprintf($format, $webservice_key->description);
+        return $webservice_key;
+    }
+
+    public function hookActionOrderStatusUpdate($args)
+    {
+        /* Place your code here. */
+        // d($args);
+    }
+
+    public function hookActionProductSave($args)
+    {
+        $data = array(
+            'shop' => $this->getShopUri(),
+            'external_id' => (int)$args['id_product']
+        );
+        WIC_Server::post('webhooks/products', $data);
+    }
+
+    public function hookActionValidateOrder($args)
+    {
+        /* Place your code here. */
+        // d($args);
     }
 
     /**
@@ -369,5 +484,23 @@ class Tenbucks extends Module
                 $this->context->controller->addCSS($this->_path.'views/css/backward.css');
             }
         }
+    }
+
+    public function getShopUri()
+    {
+        $base_url = Tools::getShopDomainSsl(1);
+        $shop_uri = $this->context->shop->getBaseUri();
+        return $base_url.$shop_uri;
+    }
+
+    public function getIframeQuery()
+    {
+        return array(
+            'url' => $this->getShopUri(),
+            'timestamp' => (int) microtime(true),
+            'platform' => 'PrestaShop',
+            'ps_version' => _PS_VERSION_,
+            'module_version' => $this->module->version,
+        );
     }
 }

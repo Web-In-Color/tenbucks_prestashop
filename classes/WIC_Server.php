@@ -14,13 +14,7 @@
 
 final class WIC_Server
 {
-    // const URL = 'https://apps.webincolor.fr/woocommerce/';
-    const URL = 'https://symfony.local/app_dev.php/';
-
-    /**
-     * The HASH alorithm to use for oAuth signature, SHA256 or SHA1.
-     */
-    const HASH_ALGORITHM = 'SHA256';
+    const URL = 'https://apps.tenbucks.io/';
 
     /**
      * Retrieve server url.
@@ -44,5 +38,35 @@ final class WIC_Server
         }
 
         return $url;
+    }
+
+    /**
+     * Send a POST request to TenBucks server
+     *
+     * @param string $path Path to reach
+     * @param array $data POST data
+     * @return array result
+     */
+    public static function post($path, array $data)
+    {
+        $url = self::URL.preg_replace('/^\//', '', $path);
+        try {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_POST, true );
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
+            // Process
+            $result = curl_exec($ch);
+            curl_close($ch);
+            return $result;
+        } catch (Exception $e) {
+            Logger::addLog($e->getTraceAsString(), 3, $e->getCode());
+            return false;
+        }
+
     }
 }

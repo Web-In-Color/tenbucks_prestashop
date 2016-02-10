@@ -1,6 +1,6 @@
 {
 "version": 3,
-"mappings": ";AAKA,yBAAyB;EACrB,UAAU,EAAE,qFAAqF;;AACjG,gCAAQ;EACJ,OAAO,EAAE,GAAO",
+"mappings": ";AAKA,yBAAyB;EACrB,UAAU,EAAE,qFAAqF;;AACjG,gCAAQ;EACJ,OAAO,EAAE,GAAO;;;AAExB,iBAAiB;EACb,UAAU,EAAE,IAAI",
 "sources": ["../sass/back.sass"],
 "names": [],
 "file": "back.css"

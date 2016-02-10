@@ -42,6 +42,8 @@ abstract class TenbucksController extends ModuleAdminController
         );
 
         $show_help = (bool) Configuration::get('TENBUCKS_DISPLAY_HELP');
+        $key = false;
+        $generate_uri = null;
 
         if ($show_help) {
             $id_key = (int) Configuration::get('TENBUCKS_WEBSERVICE_KEY_ID');
@@ -49,7 +51,6 @@ abstract class TenbucksController extends ModuleAdminController
             if (Validate::isLoadedObject($wsk)) {
                 $key = $wsk->key;
             } else {
-                $key = false;
                 $generate_uri = $this->module->getGenerateLink();
             }
         }
@@ -57,7 +58,7 @@ abstract class TenbucksController extends ModuleAdminController
         $this->context->smarty->assign(array(
             'show_help' => $show_help,
             'key' => $key,
-            'generate_uri' => $key ? null : $generate_uri,
+            'generate_uri' => $generate_uri,
             'iframe_uri' => $this->getServerUri(),
         ));
     }
@@ -68,24 +69,5 @@ abstract class TenbucksController extends ModuleAdminController
         $conf = $this->l('Settings updated.');
 
         return $this->jsonConfirmation($conf);
-    }
-
-    protected function getQuery()
-    {
-        $base_url = Tools::getShopDomainSsl(1);
-        $shop_uri = $this->context->shop->getBaseUri();
-        $lang_infos = explode('-', $this->context->language->language_code);
-
-        return array(
-            'url' => $base_url.$shop_uri,
-            'timestamp' => (int) microtime(true),
-            'platform' => 'PrestaShop',
-            'ps_version' => _PS_VERSION_,
-            'module_version' => $this->module->version,
-            'email' => $this->context->employee->email,
-            'username' => $this->context->shop->name,
-            'locale' => $lang_infos[0],
-            'country' => Tools::strtoupper($lang_infos[1])
-        );
     }
 }

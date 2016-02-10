@@ -8,42 +8,28 @@
 *}
 
 <div class="panel">
-	<div class="row moduleconfig-header">
-		<div class="col-xs-5 text-right">
-			<img src="{$module_dir|escape:'html':'UTF-8'}views/img/logo.png" />
-		</div>
-		<div class="col-xs-7 text-left">
-			<h2>{l s='Lorem' mod='tenbucks'}</h2>
-			<h4>{l s='Lorem ipsum dolor' mod='tenbucks'}</h4>
-		</div>
-	</div>
-
-	<hr />
-
-	<div class="moduleconfig-content">
-		<div class="row">
-			<div class="col-xs-12">
-				<p>
-					<h4>{l s='Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor' mod='tenbucks'}</h4>
-					<ul class="ul-spaced">
-						<li><strong>{l s='Lorem ipsum dolor sit amet' mod='tenbucks'}</strong></li>
-						<li>{l s='Lorem ipsum dolor sit amet' mod='tenbucks'}</li>
-						<li>{l s='Lorem ipsum dolor sit amet' mod='tenbucks'}</li>
-						<li>{l s='Lorem ipsum dolor sit amet' mod='tenbucks'}</li>
-						<li>{l s='Lorem ipsum dolor sit amet' mod='tenbucks'}</li>
-					</ul>
-				</p>
-
-				<br />
-
-				<p class="text-center">
-					<strong>
-						<a href="{$ctrl_link|escape:'html':'UTF-8'}" target="_blank" title="Lorem ipsum dolor">
-							{l s='Lorem ipsum dolor' mod='tenbucks' }
-						</a>
-					</strong>
-				</p>
-			</div>
-		</div>
+	<h3 class="panel-heading">
+		<i class="icon-user"></i> {l s='Account created !' mod='tenbucks'}
+	</h3>
+	<div class="panel-body">
+		<h4>{l s='You have now 6 hours to confirm your email address. Once it\'s done, you can use tenbucks.© the way you like:' mod='tenbucks'}</h4>
+		<ul class="ul-spaced">
+			<li>
+				{l s='From your back-office:' mod='tenbucks'} (<em>{l s='We added a tab for you' mod='tenbucks'}</em>)
+				<ul>
+					<li><a href="{Link::getAdminLink('AdminTenbucksApps')}">{l s='Browse app list' mod='tenbucks'}</a></li>
+					<li><a href="{Link::getAdminLink('AdminTenbucksAccount')}">{l s='See account details' mod='tenbucks'}</a></li>
+				</ul>
+			</li>
+			<li><a href="{$standaloneUrl|escape:'htmlall':'UTF-8'}">{l s='In "stand-alone" mode (new window)' mod='tenbucks'}</a></li>
+			<li>{l s='Via Firefox add-on' mod='tenbucks'} <em class="text-muted">{l s='Coming soon...' mod='tenbucks'}</em></li>
+		</ul>
+		<p class="text-center">
+			<strong>
+			  <a href="https://www.tenbucks.io" target="_blank" title="tenbucks." class="btn btn-primary">
+				  <i class="icon-globe"></i> {l s='Visit tenbucks.© website' mod='tenbucks' }
+			  </a>
+		  </strong>
+		</p>
 	</div>
 </div>
