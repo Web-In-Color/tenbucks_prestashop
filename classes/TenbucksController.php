@@ -25,7 +25,7 @@ abstract class TenbucksController extends ModuleAdminController
 
     protected function getServerUri($standalone = false)
     {
-        $query = $this->getQuery();
+        $query =$this->module->getIframeQuery();
         if ($this->redirect_to) {
             $query['redirect'] = $this->redirect_to;
         }
@@ -41,24 +41,7 @@ abstract class TenbucksController extends ModuleAdminController
             'icon' => 'process-icon-preview',
         );
 
-        $show_help = (bool) Configuration::get('TENBUCKS_DISPLAY_HELP');
-        $key = false;
-        $generate_uri = null;
-
-        if ($show_help) {
-            $id_key = (int) Configuration::get('TENBUCKS_WEBSERVICE_KEY_ID');
-            $wsk = new WebserviceKey($id_key);
-            if (Validate::isLoadedObject($wsk)) {
-                $key = $wsk->key;
-            } else {
-                $generate_uri = $this->module->getGenerateLink();
-            }
-        }
-
         $this->context->smarty->assign(array(
-            'show_help' => $show_help,
-            'key' => $key,
-            'generate_uri' => $generate_uri,
             'iframe_uri' => $this->getServerUri(),
         ));
     }

@@ -350,11 +350,13 @@ class Tenbucks extends Module
                 // success
                 Configuration::updateValue('TENBUCKS_ACCOUNT_CREATED', 1);
                 $this->installModuleTab();
-                if ($query['new_account']) {
+                $new_user = (bool)$query['new_account'];
+                if ($new_user) {
                     $msg =  $this->l('Account created. Please check your email to confirm your address');
                 } else {
                     $msg = $this->l('Shop added to your account.');
                 }
+                $this->context->smarty->assign('newUser', $new_user);
                 return $this->displayConfirmation($msg);
             } else {
                 return $this->displayError($this->l('Creation failed, please try again.'));

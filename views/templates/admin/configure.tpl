@@ -9,10 +9,29 @@
 
 <div class="panel">
 	<h3 class="panel-heading">
-		<i class="icon-user"></i> {l s='Account created !' mod='tenbucks'}
+		<i class="icon-user"></i>
+		{if isset($newUser)}
+			{if $newUser}
+				{l s='Account created!' mod='tenbucks'}
+			{else}
+				{l s='Shop added to your account!' mod='tenbucks'}
+			{/if}
+		{else}
+			{l s='Use tenbucks.©' mod='tenbucks'}
+		{/if}
 	</h3>
 	<div class="panel-body">
-		<h4>{l s='You have now 6 hours to confirm your email address. Once it\'s done, you can use tenbucks.© the way you like:' mod='tenbucks'}</h4>
+		<h4>
+			{if isset($newUser)}
+				{if $newUser}
+					{l s='You have now 6 hours to confirm your email address. Once it\'s done, you can use tenbucks.© the way you like:' mod='tenbucks'}
+				{else}
+					{l s='This shop has been added to your account, you can now use tenbucks.© the way you like:' mod='tenbucks'}
+				{/if}
+			{else}
+				{l s='Use tenbucks.© the way you like:' mod='tenbucks'}
+			{/if}
+		</h4>
 		<ul class="ul-spaced">
 			<li>
 				{l s='From your back-office:' mod='tenbucks'} (<em>{l s='We added a tab for you' mod='tenbucks'}</em>)
@@ -22,7 +41,6 @@
 				</ul>
 			</li>
 			<li><a href="{$standaloneUrl|escape:'htmlall':'UTF-8'}">{l s='In "stand-alone" mode (new window)' mod='tenbucks'}</a></li>
-			<li>{l s='Via Firefox add-on' mod='tenbucks'} <em class="text-muted">{l s='Coming soon...' mod='tenbucks'}</em></li>
 		</ul>
 		<p class="text-center">
 			<strong>

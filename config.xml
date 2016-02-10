@@ -3,7 +3,7 @@
             <name>tenbucks</name>
             <displayName><![CDATA[tenbucks]]></displayName>
             <version><![CDATA[1.0.0]]></version>
-            <description><![CDATA[In in condimentum velit; nec massa nunc.]]></description>
+            <description><![CDATA[Use tenbucks with your PrestaShop website.]]></description>
             <author><![CDATA[Web In Color]]></author>
             <tab><![CDATA[administration]]></tab>
 	<confirmUninstall>Are you sure you want to uninstall this module?</confirmUninstall>
