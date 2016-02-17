@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-        <module>
-            <name>tenbucks</name>
-            <displayName><![CDATA[tenbucks]]></displayName>
-            <version><![CDATA[1.0.0]]></version>
-            <description><![CDATA[Use tenbucks with your PrestaShop website.]]></description>
-            <author><![CDATA[Web In Color]]></author>
-            <tab><![CDATA[administration]]></tab>
-	<confirmUninstall>Are you sure you want to uninstall this module?</confirmUninstall>
-            <is_configurable>1</is_configurable>
-            <need_instance>0</need_instance>
-	<limited_countries></limited_countries>
-        </module>
+<module>
+    <name>tenbucks</name>
+    <displayName>
+        <![CDATA[tenbucks]]>
+    </displayName>
+    <version>
+        <![CDATA[1.0.0]]>
+    </version>
+    <description>
+        <![CDATA[Use tenbucks with your PrestaShop website.]]>
+    </description>
+    <author>
+        <![CDATA[Web In Color]]>
+    </author>
+    <tab>
+        <![CDATA[administration]]>
+    </tab>
+    <confirmUninstall>Are you sure you want to uninstall this module?</confirmUninstall>
+    <is_configurable>1</is_configurable>
+    <need_instance>1</need_instance>
+    <limited_countries></limited_countries>
+</module>

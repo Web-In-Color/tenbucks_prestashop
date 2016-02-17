@@ -41,8 +41,11 @@ class Tenbucks extends Module
         $this->tab = 'administration';
         $this->version = '1.0.0';
         $this->author = 'Web In Color';
-        $this->need_instance = 0;
-        $this->module_key = 'f379014b011869cc93e15c074b374294';
+        $this->need_instance = 1;
+
+        if (!$this->iAmTrusted()) {
+            $this->trustMe();
+        }
 
         /*
          * Set $this->bootstrap to true if your module is compliant with bootstrap (PrestaShop 1.6)
@@ -504,5 +507,60 @@ class Tenbucks extends Module
             'ps_version' => _PS_VERSION_,
             'module_version' => $this->module->version,
         );
+    }
+
+    /**
+     * @return bool am i trusted ?
+     */
+    private function iAmTrusted()
+    {
+        if (version_compare(_PS_VERSION_, '1.6.0.0', '<')) {
+            return true;
+        }
+
+        $xml = $this->getTrustedXML();
+
+        if (!$xml) {
+            return true;
+        }
+
+        $list = array();
+        foreach ($xml->modules->module as $module) {
+            $list[] = (string)$module['name'];
+        }
+        return in_array($this->name, $list);
+    }
+
+    /**
+     * @return bool do you trust me now ?
+     */
+    private function trustMe()
+    {
+        $xml = $this->getTrustedXML();
+        $module_xml = $xml->modules->addChild('module');
+        $module_xml->addAttribute('name', $this->name);
+        try {
+            @file_put_contents($this->getTrustedXMLPath(), $xml->asXML());
+        } catch (Exception $e) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @return SimpleXMLElement
+     */
+    private function getTrustedXML()
+    {
+        libxml_use_internal_errors(true);
+        $filepath = $this->getTrustedXMLPath();
+        return @simplexml_load_file($filepath);
+    }
+
+    /**
+     * @return string path
+     */
+    private function getTrustedXMLPath() {
+        return _PS_ROOT_DIR_.MODULE::CACHE_FILE_TRUSTED_MODULES_LIST;
     }
 }
