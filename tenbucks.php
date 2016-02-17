@@ -319,7 +319,7 @@ class Tenbucks extends Module
 
         if ($this->isCGI() && !Configuration::get('PS_WEBSERVICE_CGI_HOST')) {
             Configuration::updateValue('PS_WEBSERVICE_CGI_HOST', 1);
-            $this->informations[] = $this->l('Your server is running as CGI, we actiated CGI mode for your Webservice.');
+            $this->informations[] = $this->l('Your server is running as CGI, we activated CGI mode for your Webservice.');
         }
 
         // Include vendor library
