@@ -7,6 +7,7 @@
 *  @license   http://www.apache.org/licenses/  Apache License
 *  International Registered Trademark & Property of Web In Color
 */
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
