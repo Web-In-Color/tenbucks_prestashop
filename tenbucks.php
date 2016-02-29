@@ -39,7 +39,7 @@ class Tenbucks extends Module
     {
         $this->name = 'tenbucks';
         $this->tab = 'administration';
-        $this->version = '1.0.0';
+        $this->version = '1.0.1';
         $this->author = 'Web In Color';
         $this->need_instance = 1;
 
@@ -520,8 +520,8 @@ class Tenbucks extends Module
             'url' => $this->getShopUri(),
             'timestamp' => (int) microtime(true),
             'platform' => 'PrestaShop',
-            'ps_version' => _PS_VERSION_,
-            'module_version' => $this->module->version,
+            'cms_version' => _PS_VERSION_,
+            'module_version' => $this->version,
         );
     }
 

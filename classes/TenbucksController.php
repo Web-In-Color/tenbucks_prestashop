@@ -29,7 +29,6 @@ abstract class TenbucksController extends ModuleAdminController
         if ($this->redirect_to) {
             $query['redirect'] = $this->redirect_to;
         }
-
         return WIC_Server::getUrl('dispatch', $query, $standalone);
     }
 
