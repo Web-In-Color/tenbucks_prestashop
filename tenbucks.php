@@ -199,6 +199,11 @@ class Tenbucks extends Module
         if ((bool) Configuration::get('TENBUCKS_ACCOUNT_CREATED')) {
             $standalone_url = WIC_Server::getUrl('dispatch', $this->getIframeQuery(), true);
             $this->context->smarty->assign('standaloneUrl', $standalone_url);
+            $this->context->smarty->assign(array(
+                'standaloneUrl' => $standalone_url,
+                'AdminTenbucksAccountLink' => $this->context->link->getAdminLink($this->ctrls[0], true),
+                'AdminTenbucksAppsLink' => $this->context->link->getAdminLink($this->ctrls[1], true),
+            ));
             $this->output .= $this->context->smarty->fetch(
                 $this->getAdminTemplatePath('configure')
             );

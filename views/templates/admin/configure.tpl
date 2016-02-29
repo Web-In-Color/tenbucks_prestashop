@@ -36,8 +36,8 @@
 			<li>
 				{l s='From your back-office:' mod='tenbucks'} (<em>{l s='We added a tab for you' mod='tenbucks'}</em>)
 				<ul>
-					<li><a href="{Link::getAdminLink('AdminTenbucksApps')}">{l s='Browse app list' mod='tenbucks'}</a></li>
-					<li><a href="{Link::getAdminLink('AdminTenbucksAccount')}">{l s='See account details' mod='tenbucks'}</a></li>
+					<li><a href="{$AdminTenbucksAppsLink|escape:'htmlall':'UTF-8'}">{l s='Browse app list' mod='tenbucks'}</a></li>
+					<li><a href="{$AdminTenbucksAccountLink|escape:'htmlall':'UTF-8'}">{l s='See account details' mod='tenbucks'}</a></li>
 				</ul>
 			</li>
 			<li><a href="{$standaloneUrl|escape:'htmlall':'UTF-8'}">{l s='In "stand-alone" mode (new window)' mod='tenbucks'}</a></li>
