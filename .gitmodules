@@ -1,3 +1,6 @@
 [submodule "vendor/tenbucks_registration_client"]
 	path = vendor/tenbucks_registration_client
-	url = https://github.com/Web-In-Color/tenbucks_registration_client.git
+	url = https://bitbucket.org/webincolor/tenbucks_registration_client.git
+[submodule "vendor/tenbuckswebhooks"]
+	path = vendor/tenbuckswebhooks
+	url = https://bitbucket.org/webincolor/tenbuckswebhooks.git

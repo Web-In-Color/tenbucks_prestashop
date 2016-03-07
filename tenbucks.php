@@ -7,12 +7,12 @@
 *  @license   http://www.apache.org/licenses/  Apache License
 *  International Registered Trademark & Property of Web In Color
 */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
 include_once dirname(__FILE__).'/classes/WIC_Server.php';
+include_once dirname(__FILE__).'/vendor/tenbuckswebhooks/src/TenbucksWebhooks.php';
 
 class Tenbucks extends Module
 {
@@ -473,17 +473,44 @@ class Tenbucks extends Module
 
     public function hookActionProductSave($args)
     {
-        $data = array(
-            'shop' => $this->getShopUri(),
-            'external_id' => (int) $args['id_product'],
-        );
-        WIC_Server::post('webhooks/products', $data);
+        $id_product = (int) $args['id_product'];
+
+        return $this->addWebhooksEvent('product', $id_product);
     }
 
     public function hookActionValidateOrder($args)
     {
-        /* Place your code here. */
-        // d($args);
+        return $this->addWebhooksEvent('order', (int) $args['id_order']);
+    }
+
+    /**
+     * Add a product / order to tenbucks webhooks.
+     *
+     * @param string $model Model name
+     * @param int    $id    Model ID
+     **/
+    private function addWebhooksEvent($model, $id)
+    {
+        $client = new TenbucksWebhooks();
+        $query = array(
+            'shop_url' => $this->getShopUri(),
+            'model' => $model,
+            'external_id' => (int) $id,
+        );
+        $success = false;
+        $error_msg = sprintf('TenbucksWebhooks error with %s #%d', $model, $id);
+
+        try {
+            if ($client->send($query)) {
+                $success = true;
+            } else {
+                Logger::addLog($error_msg);
+            }
+        } catch (Exception $e) {
+            Logger::addLog($error_msg.': '.$e->getMessage());
+        }
+
+        return $success;
     }
 
     /**
